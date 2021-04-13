@@ -17,15 +17,9 @@ public class Usuario {
     private String email;
     private int idPais;
 
+    //El constructor se deja vacio por si necesitamos trabajar con Beans
     public Usuario() {
     }
-
-    public Usuario(String nombre, String email, int idPais) {
-        this.nombre = nombre;
-        this.email = email;
-        this.idPais = idPais;
-    }
-    
     
     //Setter y getter
     public int getIdUsuario() {

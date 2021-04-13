@@ -11,6 +11,7 @@ import java.util.List;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -76,11 +77,25 @@ public class UsuarioServlet extends HttpServlet {
         try {
             switch(action){
                 
+                //Si la peticion que viene es un insert
                 case "/insert":
                     insertarUsuario(request,response);
-                break;
-                
-                //Las demas acciones
+                    break;
+                //Si la peticion es un update
+                case "/update":
+                    actualizarUsuario(request,response);
+                    break;
+                //Si la peticion es un delete
+                case "/delete":
+                    eliminarUsuario(request,response);
+                    break;
+                //Este sera para mostrar el formulario de usuarios
+                case "/usuarios":
+                    formularioUsuario(request,response);
+                    break;
+                default:
+                    formularioUsuario(request,response);
+                    break;
                 
             }
         } catch (Exception e) {
@@ -96,11 +111,54 @@ public class UsuarioServlet extends HttpServlet {
         String email = request.getParameter("email");
         int idPais = Integer.parseInt(request.getParameter("idPais"));
         
-        Usuario user = new Usuario(nombre,email,idPais);
+        Usuario user = new Usuario();
+        
+        user.setNombre(nombre);
+        user.setEmail(email);
+        user.setIdPais(idPais);
         
         userDAO.insertUsuario(user);
-        response.sendRedirect("list");
+        response.sendRedirect("UsuarioServlet/usuarios");
         
     }
+    
+    private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        
+        int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+        String nombre = request.getParameter("nombre");
+        String email = request.getParameter("email");
+        int idPais = Integer.parseInt("idPais");
+        
+        Usuario user = new Usuario();
+        
+        user.setIdUsuario(idUsuario);
+        user.setNombre(nombre);
+        user.setEmail(email);
+        user.setIdPais(idPais);
+        
+        userDAO.updateUsuario(user);
+        response.sendRedirect("UsuarioServlet/usuarios");
+        
+    }
+    
+    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        
+        int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+        userDAO.deleteUsuario(idUsuario);
+        response.sendRedirect("UsuarioServlet/usuarios");
+        
+    }
+    
+    private void formularioUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        //Para trabajar el formulario de usuarios
+        List<Usuario> listaUsuarios = userDAO.selectTodosUsuarios();
+        request.setAttribute("listaUsuarios", listaUsuarios);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("usuarios.jsp");
+        dispatcher.forward(request, response);
+    }
+
 
 }
