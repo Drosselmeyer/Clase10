@@ -37,6 +37,7 @@ public class UsuarioDAO {
     public UsuarioDAO() {
     }
     
+    //Genera la conexion
     protected Connection getConnection(){
         Connection conn=null;
         
@@ -52,7 +53,8 @@ public class UsuarioDAO {
         return conn;
     }
     
-    public void insertarUsuario(Usuario user) throws SQLException{
+    //Insertar usuarios
+    public void insertUsuario(Usuario user) throws SQLException{
         
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_USUARIOS_SQL))
@@ -69,6 +71,7 @@ public class UsuarioDAO {
         
     }
     
+    //Select que guarda todos los usuarios
     public List<Usuario> selectTodosUsuarios(){
         
         List<Usuario> usuarios = new ArrayList<>();
@@ -94,6 +97,71 @@ public class UsuarioDAO {
         
         return usuarios;
     }
+    
+    //Select de un usuario
+    public Usuario selectUsuario(int id){
+        Usuario user = new Usuario();
+        
+        //Realizar la insercion
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_USUARIO_BY_ID);)
+        {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                user.setIdUsuario(rs.getInt("idUsuario"));
+                user.setNombre(rs.getString("nombre"));
+                user.setEmail(rs.getString("email"));
+                user.setIdPais(rs.getInt("idPais"));
+                
+            }
+            
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        
+        return user;
+    }
+    
+    //Eliminar usuario
+    public boolean deleteUsuario(int id) throws SQLException{
+        
+        boolean eliminado = false;
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(DELETE_USUARIO))
+        {
+            ps.setInt(1,id);
+            eliminado = ps.executeUpdate() > 0;
+            
+        } catch (Exception e) {
+        }
+        
+        return eliminado;
+    }
+    
+    //Actualizar usuario
+    public boolean updateUsuario(Usuario user) throws SQLException{
+        
+        boolean actualizado =  false;
+         try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_USUARIO))
+        {
+            //Los valores del set
+            ps.setString(1, user.getNombre());
+            ps.setString(2, user.getEmail());
+            ps.setInt(3, user.getIdPais());
+            //Este set es para el where idUsuario = ?
+            ps.setInt(4, user.getIdUsuario());
+            
+            actualizado = ps.executeUpdate()>0;
+            
+        } catch (Exception e) {
+        }
+        
+         return actualizado; 
+    }
+    
     
     
     private void printSQLException(SQLException ex) {

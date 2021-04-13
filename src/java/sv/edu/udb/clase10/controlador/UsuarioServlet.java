@@ -98,7 +98,7 @@ public class UsuarioServlet extends HttpServlet {
         
         Usuario user = new Usuario(nombre,email,idPais);
         
-        userDAO.insertarUsuario(user);
+        userDAO.insertUsuario(user);
         response.sendRedirect("list");
         
     }

@@ -53,7 +53,7 @@ public class PaisDAO {
         return conn;
     }
     
-     public void insertarUsuario(Pais pais) throws SQLException{
+     public void insertPais(Pais pais) throws SQLException{
         
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_PAIS_SQL))
@@ -68,7 +68,7 @@ public class PaisDAO {
         
     }
     
-    public List<Pais> selectTodosUsuarios(){
+    public List<Pais> selectTodosPaises(){
         
         List<Pais> paises = new ArrayList<>();
         
@@ -91,6 +91,68 @@ public class PaisDAO {
         
         return paises;
     }
+    
+    
+    //Select de un usuario
+    public Pais selectPais(int id){
+        Pais country = new Pais();
+        
+        //Realizar la insercion
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_PAIS_BY_ID);)
+        {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                country.setIdPais(rs.getInt("idPais"));
+                country.setPais(rs.getString("pais"));
+                
+            }
+            
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        
+        return country;
+    }
+    
+    //Eliminar usuario
+    public boolean deletePais(int id) throws SQLException{
+        
+        boolean eliminado = false;
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(DELETE_PAIS))
+        {
+            ps.setInt(1,id);
+            eliminado = ps.executeUpdate() > 0;
+            
+        } catch (Exception e) {
+        }
+        
+        return eliminado;
+    }
+    
+    //Actualizar usuario
+    public boolean updateUsuario(Pais country) throws SQLException{
+        
+        boolean actualizado =  false;
+         try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_PAIS))
+        {
+            //Los valores del set
+            ps.setString(1, country.getPais());
+            //Este set es para el where idUsuario = ?
+            ps.setInt(2, country.getIdPais());
+            
+            actualizado = ps.executeUpdate()>0;
+            
+        } catch (Exception e) {
+        }
+        
+         return actualizado; 
+    }
+    
     
     
     private void printSQLException(SQLException ex) {
